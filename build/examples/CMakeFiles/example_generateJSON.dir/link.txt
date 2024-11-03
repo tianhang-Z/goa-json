@@ -1,0 +1,1 @@
+/usr/bin/c++  -fno-omit-frame-pointer -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -std=c++17 -march=native -rdynamic -O3 -DNDEBUG   CMakeFiles/example_generateJSON.dir/example_generateJSON.cc.o  -o ../bin/example_generateJSON  ../lib/libgoa-json.a 

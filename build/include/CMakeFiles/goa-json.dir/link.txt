@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../lib/libgoa-json.a  
+/usr/bin/ranlib ../lib/libgoa-json.a
