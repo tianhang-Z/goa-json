@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 project(goa-json LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+enable_testing()
+
 
 option(CMAKE_BUILD_TESTS "Enable testing of the goa-json library." OFF)
 option(CMAKE_BUILD_BENCHMARK "Enable benchmark test." OFF)
