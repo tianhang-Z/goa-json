@@ -21,13 +21,13 @@ add_library(googletest ${GOOGLETEST_SOURCES})
 target_link_libraries(googletest pthread)
 
 add_executable(test_value test_value.cc)
-target_link_libraries(test_value mudong-json googletest)
+target_link_libraries(test_value goa-json googletest)
 
 add_executable(test_roundtrip test_roundtrip.cc)
-target_link_libraries(test_roundtrip mudong-json googletest)
+target_link_libraries(test_roundtrip goa-json googletest)
 
 add_executable(test_fileread test_fileread.cc)
-target_link_libraries(test_fileread mudong-json googletest)
+target_link_libraries(test_fileread goa-json googletest)
 
 set(TEST_DIR ${EXECUTABLE_OUTPUT_PATH})
 add_test(test_value ${TEST_DIR}/test_value)
