@@ -39,7 +39,11 @@ goa-json定义有三个核心concept，分别是`ReadStream`、`WriteStream`和`
 
 ![架构UML类图](./image/README_image/%E6%9E%B6%E6%9E%84UML%E7%B1%BB%E5%9B%BE.png)
 
-关系的核心是`Handler`概念。在SAX一边，`Reader`从流解析JSON并将事件发送到`Handler`。`Writer`实现了`Handler`概念，用于处理相同的事件。在DOM一边，`Document`实现了`Handler`概念，用于通过这些事件来构建DOM。在这个设计，SAX是不依赖于DOM的。甚至`Reader`和`Writer`之间也没有依赖。这提供了连接事件发送器和处理器的灵活性。除此之外，`Value`也是不依赖于SAX的。所以，除了将DOM序列化为JSON之外，用户也可以将其序列化为XML，或者做任何其他事情。
+关系的核心是`Handler`概念。在SAX一边，`Reader`从流解析JSON并将事件发送到`Handler`。`Writer`实现了`Handler`概念，用于处理相同的事件，并将解析结果传入输出流。在DOM一边，`Document`实现了`Handler`概念，用于通过这些事件来构建DOM。在这个设计，SAX是不依赖于DOM的。甚至`Reader`和`Writer`之间也没有依赖。这提供了连接事件发送器和处理器的灵活性。除此之外，`Value`也是不依赖于SAX的。所以，除了将DOM序列化为JSON之外，用户也可以将其序列化为XML，或者做任何其他事情。
+
+下面是类关系的详细uml图。
+
+![uml略](./image/README_image/uml%E7%95%A5.png)
 
 ## 值（Value）
 
@@ -145,7 +149,7 @@ Block 1, Street 2
 this_project : goa-json
 ```
 
-Document继承自Value，即Document是一个Value，可以使用`isXXX()`、`getXXX()`和`setXXX([args])`来进行操作和判断。对于`json::ValueType::TYPE_ARRAY`类型的Value，可以使用`operator[](const std::string_view&)`便捷地访问或修改Value的成员，但调用方必须确保想要获取的成员确切存在。倘若不确定，更安全的做法是使用`Document.findMember(const std::string_view& key)`，来根据key查找指向该key所对应value的迭代器，倘若不为`Document.endMember()`则说明存在，并可通过返回的迭代器访问和修改value。对于小型的JSON文档，使用DOM风格的API更加方便和简洁。
+`Document`继承自`Value`，即`Document`是一个`Value`，可以使用`isXXX()`、`getXXX()`和`setXXX([args])`来进行操作和判断。对于`json::ValueType::TYPE_ARRAY`类型的Value，可以使用`operator[](const std::string_view&)`便捷地访问或修改Value的成员，但调用方必须确保想要获取的成员确切存在。倘若不确定，更安全的做法是使用`Document.findMember(const std::string_view& key)`，来根据key查找指向该key所对应value的迭代器，倘若不为`Document.endMember()`则说明存在，并可通过返回的迭代器访问和修改value。对于小型的JSON文档，使用DOM风格的API更加方便和简洁。
 
 SAX风格API使用示例如下：
 
