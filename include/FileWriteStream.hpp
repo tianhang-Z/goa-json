@@ -8,29 +8,29 @@ string_view提供了一种对字符串的非拥有性视图，
 */
 #include "noncopyable.hpp"
 
-namespace goa{
+namespace goa {
 
-namespace json{
+namespace json {
 
 /*
 使用带缓冲的写，
 FileWriteStream对象析构时，调用fflush清空缓冲区，防止缓冲区中暂存的数据丢失
 */
-class FileWriteStream : noncopyable{
+class FileWriteStream : noncopyable {
 public:
-    explicit FileWriteStream(FILE* output):output_(output) {}
-    ~FileWriteStream() { fflush(output_); }
+  explicit FileWriteStream(FILE *output) : output_(output) {}
+  ~FileWriteStream() { fflush(output_); }
 
-    void put(char c) {fputc(c, output_); }
-    // 输出string_view到output_
-    void put(const std::string_view& str){
-        fprintf(output_, "%.*s", static_cast<int>(str.size()), str.data());
-    }
+  void put(char c) { fputc(c, output_); }
+  // 输出string_view到output_
+  void put(const std::string_view &str) {
+    fprintf(output_, "%.*s", static_cast<int>(str.size()), str.data());
+  }
 
 private:
-    FILE* output_;
+  FILE *output_;
 };
 
-} //namespace json
+} // namespace json
 
-} //namespace goa
+} // namespace goa

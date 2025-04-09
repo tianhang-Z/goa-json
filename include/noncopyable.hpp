@@ -6,20 +6,19 @@
 */
 #pragma once
 
-namespace goa{
-    
-namespace json{
+namespace goa {
 
-class noncopyable{
+namespace json {
+
+class noncopyable {
 public:
-    noncopyable(const noncopyable &) = delete;
-    void operator=(const noncopyable &) = delete;
-protected:
-    noncopyable() = default;
-    ~noncopyable() = default;
+  noncopyable(const noncopyable &) = delete;
+  void operator=(const noncopyable &) = delete;
 
+protected:
+  noncopyable() = default;
+  ~noncopyable() = default;
 };
-  
 
 } // namespace json
 } // namespace goa
