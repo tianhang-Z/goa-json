@@ -256,9 +256,7 @@ goa-json使用[Google Test](https://github.com/google/googletest)和[Google Benc
 $ git https://github.com/tianhang-Z/goa-json.git
 $ cd goa-json
 $ git submodule update --init --recursive
-$ mkdir build && cd build
-$ cmake [-DCMAKE_BUILD_TESTS=1] [-DCMAKE_BUILD_BENCHMARK=1] [-DCMAKE_BUILD_EXAMPLES=1] ..
-$ make
+$ make all
 ```
 
 可以通过选择是否添加`-DCMAKE_BUILD_TESTS=1`、`-DCMAKE_BUILD_BENCHMARK=1`、`-DCMAKE_BUILD_EXAMPLES=1`选项，来决定是否要对`test`、`bench`和`example`目录下的文件进行编译。goa-json只包含头文件，在使用时，只需将goa-json的头文件拷贝至新项目的`include`路径下即可。
