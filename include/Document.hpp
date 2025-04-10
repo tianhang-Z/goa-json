@@ -22,7 +22,7 @@ Document的内部依赖于Reader::parse进行json解析 并自己实现了handle
 可以利用value的Writer接口  调用writer这一handler 将Document对象写回文件
 */
 class Document : public Value {
-public:
+ public:
   ParseError parse(const std::string_view &json) {
     StringReadStream is(json);
     return parseStream(is);
@@ -40,7 +40,7 @@ public:
     return parse(std::string_view(json, len));
   }
 
-public:
+ public:
   bool Null() {
     addValue(Value(ValueType::TYPE_NULL));
     return true;
@@ -69,7 +69,7 @@ public:
   bool StartObject() {
     auto value = addValue(Value(ValueType::TYPE_OBJECT));
     stack_.emplace_back(
-        value); // 仅在遇到 { 时, 将当前对象压入栈  ;  遇到 } 时, EndObject出栈
+        value);  // 仅在遇到 { 时, 将当前对象压入栈  ;  遇到 } 时, EndObject出栈
     return true;
   }
   bool Key(std::string_view s) {
@@ -95,7 +95,7 @@ public:
     return true;
   }
 
-private:
+ private:
   // reader每解析一个元素 都需要添加到Document对象中
   // 对于object和array  需要维护一个栈  记录当前json对象的层级
   Value *addValue(Value &&value) {
@@ -108,7 +108,7 @@ private:
       assert(type_ == ValueType::TYPE_NULL);
       seeValue_ = true;
       type_ = value.type_;
-      a_ = value.a_; // 移动赋值  需要释放原来的内存
+      a_ = value.a_;  // 移动赋值  需要释放原来的内存
       value.type_ = ValueType::TYPE_NULL;
       value.a_ = nullptr;
       return this;
@@ -117,7 +117,7 @@ private:
     auto &top = stack_.back();
     if (top.type() == ValueType::TYPE_ARRAY) {
       top.value->addValue(
-          std::move(value)); //利用Value的addValue接口添加到数组中
+          std::move(value));  //利用Value的addValue接口添加到数组中
       top.valueCount++;
       return const_cast<Value *>(top.lastValue());
     } else {
@@ -126,7 +126,7 @@ private:
         assert((type == ValueType::TYPE_STRING) && "miss quotation mark");
         key_ = std::move(value);
         top.valueCount++;
-        return &key_; //暂时记录 key_  等待value解析
+        return &key_;  //暂时记录 key_  等待value解析
       } else {
         top.value->addMember(std::move(key_), std::move(value));
         top.valueCount++;
@@ -135,7 +135,7 @@ private:
     }
   }
 
-private:
+ private:
   struct Level {
     explicit Level(Value *value_) : value(value_), valueCount(0) {}
 
@@ -152,11 +152,11 @@ private:
     int valueCount;
   };
 
-private:
+ private:
   std::vector<Level> stack_;
   Value key_;
   bool seeValue_ = false;
 };
 
-} // namespace json
-} // namespace goa
+}  // namespace json
+}  // namespace goa

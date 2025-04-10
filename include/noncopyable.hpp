@@ -11,14 +11,14 @@ namespace goa {
 namespace json {
 
 class noncopyable {
-public:
+ public:
   noncopyable(const noncopyable &) = delete;
   void operator=(const noncopyable &) = delete;
 
-protected:
+ protected:
   noncopyable() = default;
   ~noncopyable() = default;
 };
 
-} // namespace json
-} // namespace goa
+}  // namespace json
+}  // namespace goa

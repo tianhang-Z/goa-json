@@ -10,7 +10,7 @@ namespace goa {
 namespace json {
 
 class StringReadStream : noncopyable {
-public:
+ public:
   using ConstIterator = std::string_view::const_iterator;
   // 这里是const std::string_view &json 引用传参
   explicit StringReadStream(const std::string_view &json)
@@ -25,11 +25,11 @@ public:
     next();
   }
 
-private:
+ private:
   const std::string_view json_;
   ConstIterator iter_;
 };
 
-} // namespace json
+}  // namespace json
 
-} // namespace goa
+}  // namespace goa

@@ -52,11 +52,11 @@ Value类中包含了对各种类型value的封装，包括：
 class Value {
   friend Document;
 
-public:
+ public:
   using MemberIterator = std::vector<Member>::iterator;
   using constMemberIterator = std::vector<Member>::const_iterator;
 
-public:
+ public:
   explicit inline Value(ValueType type = ValueType::TYPE_NULL);
   explicit Value(bool b) : type_(ValueType::TYPE_BOOL), b_(b) {}
   explicit Value(int32_t i32) : type_(ValueType::TYPE_INT32), i32_(i32) {}
@@ -70,15 +70,15 @@ public:
         s_(new StringWithRefCount(s, s + strlen(s))) {}
   Value(const char *s, size_t len) : Value(std::string_view(s, len)) {}
 
-  inline Value(const Value &); //拷贝构造函数
-  inline Value(Value &&);      // 移动构造函数
+  inline Value(const Value &);  //拷贝构造函数
+  inline Value(Value &&);       // 移动构造函数
 
-  inline Value &operator=(const Value &); // 拷贝赋值运算符
-  inline Value &operator=(Value &&);      //移动赋值运算符
+  inline Value &operator=(const Value &);  // 拷贝赋值运算符
+  inline Value &operator=(Value &&);       //移动赋值运算符
 
   inline ~Value();
 
-public:
+ public:
   ValueType getType() const { return type_; }
   inline size_t getSize() const;
 
@@ -159,10 +159,10 @@ public:
     return *new (this) Value(s);
   }
 
-  inline Value &
-  operator[](const std::string_view &); // non-const obj invokes this.
-  inline Value &
-  operator[](const std::string_view &) const; // non-const obj invokes this.
+  inline Value &operator[](
+      const std::string_view &);  // non-const obj invokes this.
+  inline Value &operator[](
+      const std::string_view &) const;  // non-const obj invokes this.
 
   // json迭代器
   MemberIterator beginMember() {
@@ -184,26 +184,28 @@ public:
 
   constMemberIterator beginMember() const {
     return cbeginMember();
-  } // const obj invokes this.
+  }  // const obj invokes this.
   constMemberIterator endMember() const {
     return cendMember();
-  } // const obj invokes this.
+  }  // const obj invokes this.
 
   inline MemberIterator findMember(const std::string_view &key);
-  inline constMemberIterator
-  findMember(const std::string_view &key) const; // const obj invokes this.
+  inline constMemberIterator findMember(
+      const std::string_view &key) const;  // const obj invokes this.
 
   // 添加member
   // sdt::forward<Args>(args)
   // 将参数以原始的值类别（左值或右值）转发到另一个函数中
-  template <typename V> Value &addMember(const char *k, V &&v) {
+  template <typename V>
+  Value &addMember(const char *k, V &&v) {
     return addMember(Value(k), Value(std::forward<V>(v)));
   }
 
   inline Value &addMember(Value &&, Value &&);
 
   //对array添加
-  template <typename T> Value &addValue(T &&value) {
+  template <typename T>
+  Value &addValue(T &&value) {
     assert(type_ == ValueType::TYPE_ARRAY);
     a_->data.emplace_back(std::forward<T>(value));
     return a_->data.back();
@@ -220,9 +222,10 @@ public:
   }
 
   //调用handler
-  template <typename Handler> inline bool writeTo(Handler &) const;
+  template <typename Handler>
+  inline bool writeTo(Handler &) const;
 
-private:
+ private:
   // json string array object 类型的结构体模板
   template <typename T,
             typename = std::enable_if_t<std::is_same_v<T, std::vector<char>> ||
@@ -252,11 +255,11 @@ private:
 
   // using 定义类型别名 定义不同的AddRefCount结构体类型
   using StringWithRefCount =
-      AddRefCount<std::vector<char>>; // json string类型 保存字符串
+      AddRefCount<std::vector<char>>;  // json string类型 保存字符串
   using ArrayWithRefCount =
-      AddRefCount<std::vector<Value>>; // json array类型 保存json值
+      AddRefCount<std::vector<Value>>;  // json array类型 保存json值
   using ObjectWithRefCount =
-      AddRefCount<std::vector<Member>>; // json object类型 保存键值对
+      AddRefCount<std::vector<Member>>;  // json object类型 保存键值对
 
   ValueType type_;
 
@@ -265,12 +268,12 @@ private:
     int32_t i32_;
     int64_t i64_;
     double d_;
-    StringWithRefCount *s_; //结构体指针
+    StringWithRefCount *s_;  //结构体指针
     ArrayWithRefCount *a_;
     ObjectWithRefCount *o_;
   };
 
-}; // end of class Value
+};  // end of class Value
 
 // 这个结构体用于保存json object类型 保存键值对 其中键一般是string
 // 值可以是任意json类型 每个object视为一个成员
@@ -288,94 +291,92 @@ struct Member {
 // 构造函数
 inline Value::Value(ValueType type) : type_(type), s_(nullptr) {
   switch (type_) {
-  case ValueType::TYPE_NULL:
-  case ValueType::TYPE_BOOL:
-  case ValueType::TYPE_INT32:
-  case ValueType::TYPE_INT64:
-  case ValueType::TYPE_DOUBLE:
-    break;
-  case ValueType::TYPE_STRING:
-    s_ = new StringWithRefCount();
-    break; //此处开辟内存空间 利用AddRefCount模板
-  case ValueType::TYPE_ARRAY:
-    a_ = new ArrayWithRefCount();
-    break;
-  case ValueType::TYPE_OBJECT:
-    o_ = new ObjectWithRefCount();
-    break;
-  default:
-    assert(false && "bad type when Value construct");
+    case ValueType::TYPE_NULL:
+    case ValueType::TYPE_BOOL:
+    case ValueType::TYPE_INT32:
+    case ValueType::TYPE_INT64:
+    case ValueType::TYPE_DOUBLE:
+      break;
+    case ValueType::TYPE_STRING:
+      s_ = new StringWithRefCount();
+      break;  //此处开辟内存空间 利用AddRefCount模板
+    case ValueType::TYPE_ARRAY:
+      a_ = new ArrayWithRefCount();
+      break;
+    case ValueType::TYPE_OBJECT:
+      o_ = new ObjectWithRefCount();
+      break;
+    default:
+      assert(false && "bad type when Value construct");
   }
 }
 
 // 这里浅拷贝  但使用引用计数 引用大于0原内存空间就不会被析构
 inline Value::Value(const Value &rhs) : type_(rhs.type_), s_(rhs.s_) {
   switch (type_) {
-  case ValueType::TYPE_NULL:
-  case ValueType::TYPE_BOOL:
-  case ValueType::TYPE_INT32:
-  case ValueType::TYPE_INT64:
-  case ValueType::TYPE_DOUBLE:
-    break;
-  case ValueType::TYPE_STRING:
-    s_->incrAndGet();
-    break;
-  case ValueType::TYPE_ARRAY:
-    a_->incrAndGet();
-    break;
-  case ValueType::TYPE_OBJECT:
-    o_->incrAndGet();
-    break;
-  default:
-    assert(false && "bad type when Value copy-construct");
+    case ValueType::TYPE_NULL:
+    case ValueType::TYPE_BOOL:
+    case ValueType::TYPE_INT32:
+    case ValueType::TYPE_INT64:
+    case ValueType::TYPE_DOUBLE:
+      break;
+    case ValueType::TYPE_STRING:
+      s_->incrAndGet();
+      break;
+    case ValueType::TYPE_ARRAY:
+      a_->incrAndGet();
+      break;
+    case ValueType::TYPE_OBJECT:
+      o_->incrAndGet();
+      break;
+    default:
+      assert(false && "bad type when Value copy-construct");
   }
 }
 
 inline Value::Value(Value &&rhs) : type_(rhs.type_), s_(rhs.s_) {
   rhs.type_ = ValueType::TYPE_NULL;
-  rhs.s_ = nullptr; //原右值失效
+  rhs.s_ = nullptr;  //原右值失效
 }
 
 // 类似拷贝构造
 inline Value &Value::operator=(const Value &rhs) {
-  if (this == &rhs)
-    return *this; // copy itself
+  if (this == &rhs) return *this;  // copy itself
 
   this->~Value();
   type_ = rhs.type_;
   s_ = rhs.s_;
   switch (type_) {
-  case ValueType::TYPE_NULL:
-  case ValueType::TYPE_BOOL:
-  case ValueType::TYPE_INT32:
-  case ValueType::TYPE_INT64:
-  case ValueType::TYPE_DOUBLE:
-    break;
-  case ValueType::TYPE_STRING:
-    s_->incrAndGet();
-    break;
-  case ValueType::TYPE_ARRAY:
-    a_->incrAndGet();
-    break;
-  case ValueType::TYPE_OBJECT:
-    o_->incrAndGet();
-    break;
-  default:
-    assert(false && "bad type when Value copy");
+    case ValueType::TYPE_NULL:
+    case ValueType::TYPE_BOOL:
+    case ValueType::TYPE_INT32:
+    case ValueType::TYPE_INT64:
+    case ValueType::TYPE_DOUBLE:
+      break;
+    case ValueType::TYPE_STRING:
+      s_->incrAndGet();
+      break;
+    case ValueType::TYPE_ARRAY:
+      a_->incrAndGet();
+      break;
+    case ValueType::TYPE_OBJECT:
+      o_->incrAndGet();
+      break;
+    default:
+      assert(false && "bad type when Value copy");
   }
   return *this;
 }
 
 // 移动赋值
 inline Value &Value::operator=(Value &&rhs) {
-  if (this == &rhs)
-    return *this;
+  if (this == &rhs) return *this;
 
   this->~Value();
   type_ = rhs.type_;
   s_ = rhs.s_;
   rhs.type_ = ValueType::TYPE_NULL;
-  rhs.s_ = nullptr; //原右值失效
+  rhs.s_ = nullptr;  //原右值失效
   return *this;
 }
 
@@ -383,26 +384,23 @@ inline Value &Value::operator=(Value &&rhs) {
 // 对于非基础数据类型 需判断引用计数是否为0 若为0 则释放内存空间
 inline Value::~Value() {
   switch (type_) {
-  case ValueType::TYPE_NULL:
-  case ValueType::TYPE_BOOL:
-  case ValueType::TYPE_INT32:
-  case ValueType::TYPE_INT64:
-  case ValueType::TYPE_DOUBLE:
-    break;
-  case ValueType::TYPE_STRING:
-    if (s_->decrAndGet() == 0)
-      delete s_;
-    break;
-  case ValueType::TYPE_ARRAY:
-    if (a_->decrAndGet() == 0)
-      delete a_;
-    break;
-  case ValueType::TYPE_OBJECT:
-    if (o_->decrAndGet() == 0)
-      delete o_;
-    break;
-  default:
-    assert(false && "bad type when Value deconstruct");
+    case ValueType::TYPE_NULL:
+    case ValueType::TYPE_BOOL:
+    case ValueType::TYPE_INT32:
+    case ValueType::TYPE_INT64:
+    case ValueType::TYPE_DOUBLE:
+      break;
+    case ValueType::TYPE_STRING:
+      if (s_->decrAndGet() == 0) delete s_;
+      break;
+    case ValueType::TYPE_ARRAY:
+      if (a_->decrAndGet() == 0) delete a_;
+      break;
+    case ValueType::TYPE_OBJECT:
+      if (o_->decrAndGet() == 0) delete o_;
+      break;
+    default:
+      assert(false && "bad type when Value deconstruct");
   }
 }
 
@@ -421,8 +419,7 @@ inline Value &Value::operator[](const std::string_view &key) {
   assert(type_ == ValueType::TYPE_OBJECT);
 
   auto iter = findMember(key);
-  if (iter != o_->data.end())
-    return iter->value;
+  if (iter != o_->data.end()) return iter->value;
 
   assert(false);
   static Value fake(ValueType::TYPE_NULL);
@@ -440,8 +437,8 @@ inline Value::MemberIterator Value::findMember(const std::string_view &key) {
   });
 }
 
-inline Value::constMemberIterator
-Value::findMember(const std::string_view &key) const {
+inline Value::constMemberIterator Value::findMember(
+    const std::string_view &key) const {
   return const_cast<Value &>(*this).findMember(key);
 }
 
@@ -451,60 +448,59 @@ inline Value &Value::addMember(Value &&k, Value &&v) {
   assert(findMember(k.getStringView()) == endMember());
   o_->data.emplace_back(
       std::move(k),
-      std::move(v)); // std::move 对象转换为右值引用 然后调用移动构造或赋值函数
+      std::move(v));  // std::move 对象转换为右值引用 然后调用移动构造或赋值函数
   return o_->data.back().value;
 }
 
-#define CALL(expr)                                                             \
-  do {                                                                         \
-    if (!(expr))                                                               \
-      return false;                                                            \
+#define CALL(expr)             \
+  do {                         \
+    if (!(expr)) return false; \
   } while (false)
 
 /*
 用于写json数据
 */
-template <typename Handler> inline bool Value::writeTo(Handler &handler) const {
+template <typename Handler>
+inline bool Value::writeTo(Handler &handler) const {
   switch (type_) {
-  case ValueType::TYPE_NULL:
-    CALL(handler.Null()); //类型检查
-    break;
-  case ValueType::TYPE_BOOL:
-    CALL(handler.Bool(b_));
-    break;
-  case ValueType::TYPE_INT32:
-    CALL(handler.Int32(i32_));
-    break;
-  case ValueType::TYPE_INT64:
-    CALL(handler.Int64(i64_));
-    break;
-  case ValueType::TYPE_DOUBLE:
-    CALL(handler.Double(d_));
-    break;
-  case ValueType::TYPE_STRING:
-    CALL(handler.String(getStringView()));
-    break;
-  case ValueType::TYPE_ARRAY:
-    CALL(handler.StartArray());
-    for (auto &val : getArray())
-      CALL(val.writeTo(handler)); //递归写入
-    CALL(handler.EndArray());
-    break;
-  case ValueType::TYPE_OBJECT:
-    CALL(handler.StartObject());
-    for (auto &member : getObject()) {
-      handler.Key(member.key.getStringView());
-      CALL(member.value.writeTo(handler));
-    }
-    CALL(handler.EndObject());
-    break;
-  default:
-    assert(false && "bad type when writeTo.");
+    case ValueType::TYPE_NULL:
+      CALL(handler.Null());  //类型检查
+      break;
+    case ValueType::TYPE_BOOL:
+      CALL(handler.Bool(b_));
+      break;
+    case ValueType::TYPE_INT32:
+      CALL(handler.Int32(i32_));
+      break;
+    case ValueType::TYPE_INT64:
+      CALL(handler.Int64(i64_));
+      break;
+    case ValueType::TYPE_DOUBLE:
+      CALL(handler.Double(d_));
+      break;
+    case ValueType::TYPE_STRING:
+      CALL(handler.String(getStringView()));
+      break;
+    case ValueType::TYPE_ARRAY:
+      CALL(handler.StartArray());
+      for (auto &val : getArray()) CALL(val.writeTo(handler));  //递归写入
+      CALL(handler.EndArray());
+      break;
+    case ValueType::TYPE_OBJECT:
+      CALL(handler.StartObject());
+      for (auto &member : getObject()) {
+        handler.Key(member.key.getStringView());
+        CALL(member.value.writeTo(handler));
+      }
+      CALL(handler.EndObject());
+      break;
+    default:
+      assert(false && "bad type when writeTo.");
   }
   return true;
 }
 
 #undef CALL
 
-} // namespace json
-} // namespace goa
+}  // namespace json
+}  // namespace goa

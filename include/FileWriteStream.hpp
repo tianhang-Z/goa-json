@@ -17,7 +17,7 @@ namespace json {
 FileWriteStream对象析构时，调用fflush清空缓冲区，防止缓冲区中暂存的数据丢失
 */
 class FileWriteStream : noncopyable {
-public:
+ public:
   explicit FileWriteStream(FILE *output) : output_(output) {}
   ~FileWriteStream() { fflush(output_); }
 
@@ -27,10 +27,10 @@ public:
     fprintf(output_, "%.*s", static_cast<int>(str.size()), str.data());
   }
 
-private:
+ private:
   FILE *output_;
 };
 
-} // namespace json
+}  // namespace json
 
-} // namespace goa
+}  // namespace goa

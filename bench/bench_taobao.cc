@@ -11,8 +11,7 @@ template <class... ExtraArgs>
 void BM_read(benchmark::State &s, ExtraArgs &&... extra_args) {
   for (auto _ : s) {
     FILE *input = fopen(extra_args..., "r");
-    if (input == nullptr)
-      exit(1);
+    if (input == nullptr) exit(1);
     json::FileReadStream is(input);
     benchmark::DoNotOptimize(is);
     fclose(input);
@@ -23,8 +22,7 @@ template <class... ExtraArgs>
 void BM_read_parse(benchmark::State &s, ExtraArgs &&... extra_args) {
   for (auto _ : s) {
     FILE *input = fopen(extra_args..., "r");
-    if (input == nullptr)
-      exit(1);
+    if (input == nullptr) exit(1);
     json::Document doc;
     json::FileReadStream is(input);
     fclose(input);
@@ -38,8 +36,7 @@ template <class... ExtraArgs>
 void BM_read_parse_write(benchmark::State &s, ExtraArgs &&... extra_args) {
   for (auto _ : s) {
     FILE *input = fopen(extra_args..., "r");
-    if (input == nullptr)
-      exit(1);
+    if (input == nullptr) exit(1);
     json::Document doc;
     json::FileReadStream is(input);
     fclose(input);

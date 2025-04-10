@@ -12,7 +12,7 @@ namespace json {
 
 // 缓存文件内容 提供访问接口
 class FileReadStream : noncopyable {
-public:
+ public:
   // using 创建类型别名
   using ConstIterator = std::vector<char>::const_iterator;
 
@@ -20,8 +20,7 @@ public:
     char buf[65536];
     while (true) {
       size_t n = fread(buf, 1, sizeof(buf), input);
-      if (n == 0)
-        break;
+      if (n == 0) break;
       buffer_.insert(buffer_.end(), buf, buf + n);
     }
 
@@ -38,10 +37,10 @@ public:
     next();
   }
 
-private:
+ private:
   std::vector<char> buffer_;
   ConstIterator iter_;
 };
-} // namespace json
+}  // namespace json
 
-} // namespace goa
+}  // namespace goa

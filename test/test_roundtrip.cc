@@ -54,8 +54,9 @@ TEST(json_round, array) {
 
 TEST(json_round, object) {
   TEST_ROUNDTRIP("{}");
-  TEST_ROUNDTRIP("{\"n\":null,\"f\":false,\"t\":true,\"i\":123,\"s\":\"abc\","
-                 "\"a\":[1,2,3],\"o\":{\"1\":1,\"2\":2,\"3\":3}}");
+  TEST_ROUNDTRIP(
+      "{\"n\":null,\"f\":false,\"t\":true,\"i\":123,\"s\":\"abc\","
+      "\"a\":[1,2,3],\"o\":{\"1\":1,\"2\":2,\"3\":3}}");
 }
 
 int main(int argc, char **argv) {

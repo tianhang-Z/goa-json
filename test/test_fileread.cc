@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <iostream>
 
 #include <Document.hpp>
 #include <StringWriteStream.hpp>
 #include <Writer.hpp>
+#include <iostream>
 
 using namespace goa::json;
 
@@ -21,8 +21,7 @@ std::string jsonDir("../../bench/taobao/cart.json");
 
 TEST(FileRelative, read) {
   FILE *input = fopen(jsonDir.c_str(), "r");
-  if (input == nullptr)
-    exit(1);
+  if (input == nullptr) exit(1);
   FileReadStream is(input);
   assert(is.peek() == '{' && "wrong peek");
   fclose(input);
@@ -31,8 +30,7 @@ TEST(FileRelative, read) {
 
 TEST(FileRelative, read_parse) {
   FILE *input = fopen(jsonDir.c_str(), "r");
-  if (input == nullptr)
-    exit(1);
+  if (input == nullptr) exit(1);
   FileReadStream is(input);
   fclose(input);
   Document doc;
@@ -41,8 +39,7 @@ TEST(FileRelative, read_parse) {
 
 TEST(FileRelative, read_parse_write) {
   FILE *input = fopen(jsonDir.c_str(), "r");
-  if (input == nullptr)
-    exit(1);
+  if (input == nullptr) exit(1);
   FileReadStream is(input);
   fclose(input);
   Document doc;

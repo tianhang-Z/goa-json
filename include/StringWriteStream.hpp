@@ -10,7 +10,7 @@ namespace goa {
 namespace json {
 
 class StringWriteStream : noncopyable {
-public:
+ public:
   void put(char c) { buffer_.push_back(c); }
   void put(const std::string_view &str) {
     buffer_.insert(buffer_.end(), str.begin(), str.end());
@@ -27,9 +27,9 @@ public:
     // return std::string(buffer_.data(), buffer_.size());
   }
 
-private:
+ private:
   std::vector<char> buffer_;
 };
 
-} // namespace json
-} // namespace goa
+}  // namespace json
+}  // namespace goa

@@ -22,7 +22,7 @@ namespace json {
    因此需根据情况递归解析 并将解析结果传递给handler 利用handler处理结果
 */
 class Reader : noncopyable {
-public:
+ public:
   template <typename ReadStream, typename Handler,
             typename = std::enable_if_t<
                 std::is_same<ReadStream, FileReadStream>::value ||
@@ -32,20 +32,18 @@ public:
       parseWhiteSpace(is);
       parseValue(is, handler);
       parseWhiteSpace(is);
-      if (is.hasNext())
-        throw Exception(ParseError::PARSE_ROOT_NOT_SINGULAR);
+      if (is.hasNext()) throw Exception(ParseError::PARSE_ROOT_NOT_SINGULAR);
       return ParseError::PARSE_OK;
     } catch (Exception &e) {
       return e.err();
     }
   }
 
-private:
+ private:
 // throw 语句用于抛出一个异常对象。通常是继承自 std::exception
 // 的对象，或者自定义异常类型。
-#define CALL(expr)                                                             \
-  if (!(expr))                                                                 \
-  throw Exception(ParseError::PARSE_USER_STOPPED)
+#define CALL(expr) \
+  if (!(expr)) throw Exception(ParseError::PARSE_USER_STOPPED)
 
   // Readstream都是字节流 对字节使用next方法逐个解析
 
@@ -60,17 +58,17 @@ private:
     for (int i = 0; i < 4; i++) {
       u <<= 4;
       switch (char ch = is.next()) {
-      case '0' ... '9':
-        u |= ch - '0';
-        break;
-      case 'a' ... 'f':
-        u |= ch - 'a' + 10;
-        break;
-      case 'A' ... 'F':
-        u |= ch - 'A' + 10;
-        break;
-      default:
-        throw Exception(ParseError::PARSE_BAD_UNICODE_HEX);
+        case '0' ... '9':
+          u |= ch - '0';
+          break;
+        case 'a' ... 'f':
+          u |= ch - 'a' + 10;
+          break;
+        case 'A' ... 'F':
+          u |= ch - 'A' + 10;
+          break;
+        default:
+          throw Exception(ParseError::PARSE_BAD_UNICODE_HEX);
       }
     }
     return u;
@@ -106,17 +104,17 @@ private:
     }
     if (*literal == '\0') {
       switch (type) {
-      case ValueType::TYPE_NULL:
-        CALL(handler.Null());
-        return;
-      case ValueType::TYPE_BOOL:
-        CALL(handler.Bool(ch == 't'));
-        return;
-      case ValueType::TYPE_DOUBLE:
-        CALL(handler.Double(ch == 'N' ? NAN : INFINITY));
-        return;
-      default:
-        assert(false && "bad type");
+        case ValueType::TYPE_NULL:
+          CALL(handler.Null());
+          return;
+        case ValueType::TYPE_BOOL:
+          CALL(handler.Bool(ch == 't'));
+          return;
+        case ValueType::TYPE_DOUBLE:
+          CALL(handler.Double(ch == 'N' ? NAN : INFINITY));
+          return;
+        default:
+          assert(false && "bad type");
       }
     }
     throw Exception(ParseError::PARSE_BAD_VALUE);
@@ -142,17 +140,14 @@ private:
 
     auto start = is.getConstIter();
 
-    if (is.peek() == '-')
-      is.next();
+    if (is.peek() == '-') is.next();
 
     if (is.peek() == '0') {
       is.next();
-      if (isDigit(is.peek()))
-        throw Exception(ParseError::PARSE_BAD_VALUE);
+      if (isDigit(is.peek())) throw Exception(ParseError::PARSE_BAD_VALUE);
     } else if (isDigit19(is.peek())) {
       is.next();
-      while (isDigit(is.peek()))
-        is.next();
+      while (isDigit(is.peek())) is.next();
     } else
       throw Exception(ParseError::PARSE_BAD_VALUE);
 
@@ -163,23 +158,18 @@ private:
     if (is.peek() == '.') {
       expectType = ValueType::TYPE_DOUBLE;
       is.next();
-      if (!isDigit(is.peek()))
-        throw Exception(ParseError::PARSE_BAD_VALUE);
-      while (isDigit(is.peek()))
-        is.next();
+      if (!isDigit(is.peek())) throw Exception(ParseError::PARSE_BAD_VALUE);
+      while (isDigit(is.peek())) is.next();
     }
 
     if (is.peek() == 'e' || is.peek() == 'E') {
       //解析指数
       expectType = ValueType::TYPE_DOUBLE;
       is.next();
-      if (is.peek() == '+' || is.peek() == '-')
-        is.next();
-      if (!isDigit(is.peek()))
-        throw Exception(ParseError::PARSE_BAD_VALUE);
+      if (is.peek() == '+' || is.peek() == '-') is.next();
+      if (!isDigit(is.peek())) throw Exception(ParseError::PARSE_BAD_VALUE);
       is.next();
-      while (isDigit(is.peek()))
-        is.next();
+      while (isDigit(is.peek())) is.next();
     }
 
     // int32 or int64
@@ -188,24 +178,21 @@ private:
       if (expectType == ValueType::TYPE_DOUBLE)
         throw Exception(ParseError::PARSE_BAD_VALUE);
       switch (is.next()) {
-      case '3':
-        if (is.next() != '2')
+        case '3':
+          if (is.next() != '2') throw Exception(ParseError::PARSE_BAD_VALUE);
+          expectType = ValueType::TYPE_INT32;
+          break;
+        case '6':
+          if (is.next() != '4') throw Exception(ParseError::PARSE_BAD_VALUE);
+          expectType = ValueType::TYPE_INT64;
+          break;
+        default:
           throw Exception(ParseError::PARSE_BAD_VALUE);
-        expectType = ValueType::TYPE_INT32;
-        break;
-      case '6':
-        if (is.next() != '4')
-          throw Exception(ParseError::PARSE_BAD_VALUE);
-        expectType = ValueType::TYPE_INT64;
-        break;
-      default:
-        throw Exception(ParseError::PARSE_BAD_VALUE);
       }
     }
 
     auto end = is.getConstIter();
-    if (start == end)
-      throw Exception(ParseError::PARSE_BAD_VALUE);
+    if (start == end) throw Exception(ParseError::PARSE_BAD_VALUE);
 
     try {
       //
@@ -256,69 +243,69 @@ private:
     while (is.hasNext()) {
       char ch = is.next();
       switch (ch) {
-      case '"':
-        if (isKey) {
-          CALL(handler.Key(std::move(buffer)));
-        } else {
-          CALL(handler.String(std::move(buffer)));
-        }
-        return;
-      case '\x01' ... '\x1f':
-        // 此为不可打印的字符 是控制字符
-        throw Exception(ParseError::PARSE_BAD_STRING_CHAR);
-      case '\\':
-        // 转义字符特殊处理 以下是json支持的转义字符
-        switch (ch = is.next()) {
         case '"':
-          buffer.push_back('"');
-          break;
-        case '\\':
-          buffer.push_back('\\');
-          break;
-        case '/':
-          buffer.push_back('/');
-          break;
-        case 'b':
-          buffer.push_back('\b');
-          break;
-        case 'f':
-          buffer.push_back('\f');
-          break;
-        case 'n':
-          buffer.push_back('\n');
-          break;
-        case 'r':
-          buffer.push_back('\r');
-          break;
-        case 't':
-          buffer.push_back('\t');
-          break;
-        case 'u': {
-          //  json使用\u  表示unicode码点
-          //  json对于utf16里超出BMP的字符 使用两个/u和高低代理项
-          //  根据高低代理项可以推算unicode码点
-          unsigned u = parseHex4(is);
-          if (u >= 0xD800 && u <= 0xDBFF) {
-            if (is.next() != '\\')
-              throw Exception(ParseError::PARSE_BAD_UNICODE_SURROGATE);
-            if (is.next() != 'u')
-              throw Exception(ParseError::PARSE_BAD_UNICODE_SURROGATE);
-            unsigned u2 = parseHex4(is);
-            //下面根据utf16的高低代理项 计算unicode码点
-            if (u2 >= 0xDC00 && u2 <= 0xDFFF)
-              u = 0x10000 + (u - 0xD800) * 0x400 + (u2 - 0xDC00);
-            else
-              throw Exception(ParseError::PARSE_BAD_UNICODE_SURROGATE);
+          if (isKey) {
+            CALL(handler.Key(std::move(buffer)));
+          } else {
+            CALL(handler.String(std::move(buffer)));
           }
-          encodeUtf8(buffer, u);
+          return;
+        case '\x01' ... '\x1f':
+          // 此为不可打印的字符 是控制字符
+          throw Exception(ParseError::PARSE_BAD_STRING_CHAR);
+        case '\\':
+          // 转义字符特殊处理 以下是json支持的转义字符
+          switch (ch = is.next()) {
+            case '"':
+              buffer.push_back('"');
+              break;
+            case '\\':
+              buffer.push_back('\\');
+              break;
+            case '/':
+              buffer.push_back('/');
+              break;
+            case 'b':
+              buffer.push_back('\b');
+              break;
+            case 'f':
+              buffer.push_back('\f');
+              break;
+            case 'n':
+              buffer.push_back('\n');
+              break;
+            case 'r':
+              buffer.push_back('\r');
+              break;
+            case 't':
+              buffer.push_back('\t');
+              break;
+            case 'u': {
+              //  json使用\u  表示unicode码点
+              //  json对于utf16里超出BMP的字符 使用两个/u和高低代理项
+              //  根据高低代理项可以推算unicode码点
+              unsigned u = parseHex4(is);
+              if (u >= 0xD800 && u <= 0xDBFF) {
+                if (is.next() != '\\')
+                  throw Exception(ParseError::PARSE_BAD_UNICODE_SURROGATE);
+                if (is.next() != 'u')
+                  throw Exception(ParseError::PARSE_BAD_UNICODE_SURROGATE);
+                unsigned u2 = parseHex4(is);
+                //下面根据utf16的高低代理项 计算unicode码点
+                if (u2 >= 0xDC00 && u2 <= 0xDFFF)
+                  u = 0x10000 + (u - 0xD800) * 0x400 + (u2 - 0xDC00);
+                else
+                  throw Exception(ParseError::PARSE_BAD_UNICODE_SURROGATE);
+              }
+              encodeUtf8(buffer, u);
+              break;
+            }
+            default:
+              throw Exception(ParseError::PARSE_BAD_STRING_ESCAPE);
+          }
           break;
-        }
         default:
-          throw Exception(ParseError::PARSE_BAD_STRING_ESCAPE);
-        }
-        break;
-      default:
-        buffer.push_back(ch);
+          buffer.push_back(ch);
       }
     }
     throw Exception(ParseError::PARSE_MISS_QUOTATION_MARK);
@@ -343,14 +330,14 @@ private:
       parseValue(is, handler);
       parseWhiteSpace(is);
       switch (is.next()) {
-      case ',':
-        parseWhiteSpace(is);
-        break;
-      case ']':
-        CALL(handler.EndArray());
-        return;
-      default:
-        throw Exception(ParseError::PARSE_MISS_COMMA_OR_SQUARE_BRACKET);
+        case ',':
+          parseWhiteSpace(is);
+          break;
+        case ']':
+          CALL(handler.EndArray());
+          return;
+        default:
+          throw Exception(ParseError::PARSE_MISS_COMMA_OR_SQUARE_BRACKET);
       }
     }
   }
@@ -372,13 +359,11 @@ private:
 
     while (true) {
       // parse key
-      if (is.peek() != '"')
-        throw Exception(ParseError::PARSE_MISS_KEY);
+      if (is.peek() != '"') throw Exception(ParseError::PARSE_MISS_KEY);
       parseString(is, handler, true);
       parseWhiteSpace(is);
 
-      if (is.next() != ':')
-        throw Exception(ParseError::PARSE_MISS_COLON);
+      if (is.next() != ':') throw Exception(ParseError::PARSE_MISS_COLON);
       parseWhiteSpace(is);
 
       // parse value
@@ -386,14 +371,14 @@ private:
       parseValue(is, handler);
       parseWhiteSpace(is);
       switch (is.next()) {
-      case ',':
-        parseWhiteSpace(is);
-        break;
-      case '}':
-        CALL(handler.EndObject());
-        return;
-      default:
-        throw Exception(ParseError::PARSE_MISS_COMMA_OR_CURLY_BRACKET);
+        case ',':
+          parseWhiteSpace(is);
+          break;
+        case '}':
+          CALL(handler.EndObject());
+          return;
+        default:
+          throw Exception(ParseError::PARSE_MISS_COMMA_OR_CURLY_BRACKET);
       }
     }
   }
@@ -405,34 +390,33 @@ private:
       typename = std::enable_if_t<std::is_same_v<ReadStream, FileReadStream> ||
                                   std::is_same_v<ReadStream, StringReadStream>>>
   static void parseValue(ReadStream &is, Handler &handler) {
-    if (!is.hasNext())
-      throw Exception(ParseError::PARSE_EXPECT_VALUE);
+    if (!is.hasNext()) throw Exception(ParseError::PARSE_EXPECT_VALUE);
 
     switch (is.peek()) {
-    case 'n':
-      return parseLiteral(is, handler, "null", ValueType::TYPE_NULL);
-    case 't':
-      return parseLiteral(is, handler, "true", ValueType::TYPE_BOOL);
-    case 'f':
-      return parseLiteral(is, handler, "false", ValueType::TYPE_BOOL);
-    case '"':
-      return parseString(is, handler, false);
-    case '[':
-      return parseArray(is, handler);
-    case '{':
-      return parseObject(is, handler);
-    default:
-      return parseNumber(is, handler);
+      case 'n':
+        return parseLiteral(is, handler, "null", ValueType::TYPE_NULL);
+      case 't':
+        return parseLiteral(is, handler, "true", ValueType::TYPE_BOOL);
+      case 'f':
+        return parseLiteral(is, handler, "false", ValueType::TYPE_BOOL);
+      case '"':
+        return parseString(is, handler, false);
+      case '[':
+        return parseArray(is, handler);
+      case '{':
+        return parseObject(is, handler);
+      default:
+        return parseNumber(is, handler);
     }
   }
 
-private:
+ private:
   static bool isDigit(char ch) { return ch >= '0' && ch <= '9'; }
   static bool isDigit19(char ch) { return ch >= '1' && ch <= '9'; }
   static inline void encodeUtf8(std::string &buffer, unsigned u);
 };
-} // namespace json
-} // namespace goa
+}  // namespace json
+}  // namespace goa
 
 #pragma GCC diagnostic push
 // 将当前的警告设置保存在一个堆栈中，以便后续可以恢复。
@@ -473,31 +457,30 @@ pairs）来表示。 这些字符由一个高代理码点和一个低代理码�
 cpp的string可以存储utf8格式的字符串 eg:"hello,世界"
 */
 inline void goa::json::Reader::encodeUtf8(std::string &buffer, unsigned u) {
-
   // unicode stuff from Milo's tutorial
   // 判断u在上面哪个范围内 将unicode码点 编码为 utf8格式
 
   switch (u) {
-  case 0x00 ... 0x7F:
-    buffer.push_back(u & 0xFF);
-    break;
-  case 0x080 ... 0x7FF:
-    buffer.push_back(0xC0 | ((u >> 6) & 0xFF));
-    buffer.push_back(0x80 | (u & 0x3F));
-    break;
-  case 0x0800 ... 0xFFFF:
-    buffer.push_back(0xE0 | ((u >> 12) & 0xFF));
-    buffer.push_back(0x80 | ((u >> 6) & 0x3F));
-    buffer.push_back(0x80 | (u & 0x3F));
-    break;
-  case 0x010000 ... 0x10FFFF:
-    buffer.push_back(0xF0 | ((u >> 18) & 0xFF));
-    buffer.push_back(0x80 | ((u >> 12) & 0x3F));
-    buffer.push_back(0x80 | ((u >> 6) & 0x3F));
-    buffer.push_back(0x80 | (u & 0x3F));
-    break;
-  default:
-    assert(false && "out of range");
+    case 0x00 ... 0x7F:
+      buffer.push_back(u & 0xFF);
+      break;
+    case 0x080 ... 0x7FF:
+      buffer.push_back(0xC0 | ((u >> 6) & 0xFF));
+      buffer.push_back(0x80 | (u & 0x3F));
+      break;
+    case 0x0800 ... 0xFFFF:
+      buffer.push_back(0xE0 | ((u >> 12) & 0xFF));
+      buffer.push_back(0x80 | ((u >> 6) & 0x3F));
+      buffer.push_back(0x80 | (u & 0x3F));
+      break;
+    case 0x010000 ... 0x10FFFF:
+      buffer.push_back(0xF0 | ((u >> 18) & 0xFF));
+      buffer.push_back(0x80 | ((u >> 12) & 0x3F));
+      buffer.push_back(0x80 | ((u >> 6) & 0x3F));
+      buffer.push_back(0x80 | (u & 0x3F));
+      break;
+    default:
+      assert(false && "out of range");
   }
 }
 

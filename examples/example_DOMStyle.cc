@@ -1,7 +1,6 @@
 #include <Document.hpp>
 #include <FileWriteStream.hpp>
 #include <Writer.hpp>
-
 #include <iostream>
 
 using namespace goa;
@@ -12,16 +11,17 @@ Document接受一个string_view对象
 */
 int main() {
   json::Document doc;
-  auto err = doc.parse("{"
-                       "    \"precision\": \"zip\","
-                       "    \"Latitude\": 37.766800000000003,"
-                       "    \"Longitude\": -122.3959,"
-                       "    \"Address\": \"\","
-                       "    \"City\": \"SAN FRANCISCO\","
-                       "    \"State\": \"CA\","
-                       "    \"Zip\": \"94107\","
-                       "    \"Country\": \"US\""
-                       "    }");
+  auto err = doc.parse(
+      "{"
+      "    \"precision\": \"zip\","
+      "    \"Latitude\": 37.766800000000003,"
+      "    \"Longitude\": -122.3959,"
+      "    \"Address\": \"\","
+      "    \"City\": \"SAN FRANCISCO\","
+      "    \"State\": \"CA\","
+      "    \"Zip\": \"94107\","
+      "    \"Country\": \"US\""
+      "    }");
 
   if (err != json::ParseError::PARSE_OK) {
     std::cerr << json::parseErrorString(err) << std::endl;

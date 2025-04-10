@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <iostream>
-
 #include <Value.hpp>
+#include <iostream>
 
 using namespace goa;
 

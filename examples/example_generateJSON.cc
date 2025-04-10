@@ -1,8 +1,7 @@
 
-#include <iostream>
-
 #include <FileWriteStream.hpp>
 #include <Writer.hpp>
+#include <iostream>
 
 using namespace goa;
 
