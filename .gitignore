@@ -1,4 +1,5 @@
 build/
 .cache/
 .vscode/
+.git/
 /third_party
