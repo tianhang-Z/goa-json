@@ -60,6 +60,7 @@ class Exception : public std::exception {
   ParseError err_;
 };
 
+#undef ERROR_MAP
 }  // namespace json
 
 }  // namespace goa
